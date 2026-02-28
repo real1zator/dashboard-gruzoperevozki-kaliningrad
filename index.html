@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>База клиентов — Дашборд</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',system-ui,sans-serif; background:#0f1117; color:#e0e0e0; padding:24px; }
+h1 { font-size:28px; margin-bottom:20px; color:#fff; }
+.stats { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px; }
+.card { background:#1a1d27; border-radius:12px; padding:16px 24px; min-width:140px; }
+.card .num { font-size:32px; font-weight:700; color:#4fc3f7; }
+.card .label { font-size:13px; color:#888; margin-top:4px; }
+.card.total .num { color:#fff; }
+.card.niche-lash .num { color:#e91e90; }
+.card.niche-nail .num { color:#ff6b9d; }
+.card.niche-cargo .num { color:#66bb6a; }
+.card.niche-salon .num { color:#ffa726; }.card.niche-renovation .num { color:#42a5f5; }.card.status .num { color:#ab47bc; }
+.search { margin-bottom:16px; }
+.search input { background:#1a1d27; border:1px solid #333; border-radius:8px;
+  padding:10px 16px; font-size:15px; color:#fff; width:400px; outline:none; }
+.search input:focus { border-color:#4fc3f7; }
+table { width:100%; border-collapse:collapse; background:#1a1d27; border-radius:12px; overflow:hidden; }
+th { background:#252830; padding:12px 14px; text-align:left; font-size:13px;
+  color:#888; text-transform:uppercase; letter-spacing:.5px; position:sticky; top:0; }
+td { padding:10px 14px; border-top:1px solid #252830; font-size:14px; }
+tr:hover { background:#252830; }
+a { color:#4fc3f7; text-decoration:none; }
+a:hover { text-decoration:underline; }
+.badge { padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.st-new { background:#333; color:#aaa; }
+.st-sent { background:#1b3a4b; color:#4fc3f7; }
+.st-paid { background:#1b4332; color:#66bb6a; }
+.empty { text-align:center; padding:60px; color:#555; font-size:18px; }
+.clickable { cursor:pointer; transition:transform .15s, box-shadow .15s; user-select:none; }
+.clickable:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(79,195,247,.25); }
+.clickable.active { outline:2px solid #4fc3f7; outline-offset:2px; }
+.filter-hint { color:#666; font-size:13px; margin-bottom:16px; }
+.filter-hint span { color:#4fc3f7; cursor:pointer; }
+.filter-hint span:hover { text-decoration:underline; }
+.dl-sel { border:none; border-radius:14px; padding:3px 10px; font-size:12px; font-weight:600; cursor:pointer; outline:none; appearance:none; -webkit-appearance:none; }
+.dl-sel[data-v="Не писал"] { background:#2a2a2a; color:#777; }
+.dl-sel[data-v="Написал"]  { background:#1b3a4b; color:#4fc3f7; }
+.dl-sel[data-v="Думает"]   { background:#3a2e10; color:#ffa726; }
+.dl-sel[data-v="Продан"]   { background:#1b4332; color:#66bb6a; }
+</style>
+</head>
+<body>
+<h1>📊 База клиентов</h1>
+
+    <div class="stats">
+        <div class="card total clickable" onclick="filterNiche('all')"><div class="num">12</div><div class="label">Всего клиентов</div></div>
+    <div class="card niche-lash clickable" onclick="filterNiche('lash')"><div class="num">0</div><div class="label">Ресницы</div></div>
+<div class="card niche-nail clickable" onclick="filterNiche('nail')"><div class="num">0</div><div class="label">Маникюр</div></div>
+<div class="card niche-cargo clickable" onclick="filterNiche('cargo')"><div class="num">11</div><div class="label">Грузоперевозки</div></div>
+<div class="card niche-salon clickable" onclick="filterNiche('salon')"><div class="num">0</div><div class="label">Салон красоты</div></div>
+<div class="card niche-renovation clickable" onclick="filterNiche('renovation')"><div class="num">1</div><div class="label">Ремонт</div></div>
+<div class="card status clickable" onclick="filterStatus('Готов')"><div class="num">12</div><div class="label">Готов</div></div>
+</div>
+<div class="search">
+  <input type="text" id="search" placeholder="Поиск по имени, городу, нише..." oninput="filterTable()">
+</div>
+<div class="filter-hint" id="filterHint" style="display:none">
+  Фильтр: <strong id="filterName"></strong> &nbsp;·&nbsp; <span onclick="filterNiche('all')">× сбросить</span>
+</div>
+<table id="clients">
+<thead><tr><th>Название</th><th>Ниша</th><th>Шаблон</th><th>Папка</th><th>Город</th><th>Статус</th><th>Диалог</th><th>Ссылка_Авито</th><th>Ссылка_демо</th><th>Дата добавления</th></tr></thead>
+<tbody>
+<tr data-niche="cargo" data-status="Готов"><td>Сергей</td><td data-niche="cargo">Грузоперевозки</td><td>Темные (single_page)</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Сергей">Сайты-По-Темам\Сергей</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozkipereezdy_1953217037" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/sergey-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-28</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>Дмитрий 2</td><td data-niche="cargo">Грузоперевозки</td><td>Темные-2-blue-cyan</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Дмитрий 2">Сайты-По-Темам\Дмитрий 2</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_pereezd_dostavka_po_gorodu_i_obl_7822622550" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/dmitriy2-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-28</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>ПроГрузчики</td><td data-niche="cargo">Грузоперевозки</td><td>emerald</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\ПроГрузчики">Сайты-По-Темам\ПроГрузчики</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzchiki_na_chas_7947010041" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/progruzchiki-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-28</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>ГрузПеревезу</td><td data-niche="cargo">Грузоперевозки</td><td>purple</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\ГрузПеревезу">Сайты-По-Темам\ГрузПеревезу</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_pereezdy_gruzchiki_7765576475" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/gruzperevezu-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-28</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>Герман</td><td data-niche="cargo">Грузоперевозки</td><td>blue-cyan</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Герман">Сайты-По-Темам\Герман</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_dostavka_2402010935" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/german-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-28</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>Денис</td><td data-niche="cargo">Грузоперевозки</td><td>red-gold</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Денис">Сайты-По-Темам\Денис</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_pereezdy_gruzchiki_4319433391" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/denis-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-28</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>Переезд Экспресс</td><td data-niche="cargo">Грузоперевозки</td><td>_ШАБЛОН-Переезд</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Переезд-Экспресс">Сайты-По-Темам\Переезд-Экспресс</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_pereezdy_gruzchiki_3581042656" target="_blank">Авито ↗</a></td><td></td><td>2026-02-26</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>Дмитрий</td><td data-niche="cargo">Грузоперевозки</td><td>_ШАБЛОН-Переезд</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Дмитрий">Сайты-По-Темам\Дмитрий</td><td>Адрес: Калининградская обл., Калининград, Московский районр-н Московский</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_pereezdy_gruzchiki_3581042656" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/dmitriy-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-26</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>Артём-ТФ</td><td data-niche="cargo">Грузоперевозки</td><td>_ШАБЛОН-ТФ-Переезд</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Артём-ТФ">Сайты-По-Темам\Артём-ТФ</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_gruzchiki_kvartirnye_pereezdy_2449768645?context=H4sIAAAAAAAA_wE_AMD_YToyOntzOjEzOiJsb2NhbFByaW9yaXR5IjtiOjA7czoxOiJ4IjtzOjE2OiJpZ3hSbUJaZTJBN1o5VGR5Ijt9Q3fy6T8AAAA" target="_blank">Авито ↗</a></td><td><a href="https://real1zator.github.io/artem-gruzoperevozki-kaliningrad/" target="_blank">Демо ↗</a></td><td>2026-02-25</td></tr>
+<tr data-niche="renovation" data-status="Готов"><td>Ремонт Калининград</td><td data-niche="renovation">Ремонт</td><td>Ремонт-1</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Ремонт-1">Сайты-По-Темам\Ремонт-1</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/santehnik_4002145324" target="_blank">Авито ↗</a></td><td></td><td>2026-02-25</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>Артём</td><td data-niche="cargo">Грузоперевозки</td><td>Артём</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Артём">Сайты-По-Темам\Артём</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/gruzoperevozki_dostavka_pereezdy_gruzchiki_2993475651" target="_blank">Авито ↗</a></td><td></td><td>2026-02-18</td></tr>
+<tr data-niche="cargo" data-status="Готов"><td>ТК Переезд Экспресс</td><td data-niche="cargo">Грузоперевозки</td><td>Переезд-1</td><td title="D:\PROJCT\САЙТ\Сайты-По-Темам\Переезд-1">Сайты-По-Темам\Переезд-1</td><td>Калининград</td><td><span class="badge ">Готов</span></td><td><select class="dl-sel" data-v="Не писал" onchange="dlChange(this)"><option selected>Не писал</option><option>Написал</option><option>Думает</option><option>Продан</option></select></td><td><a href="https://www.avito.ru/kaliningrad/predlozheniya_uslug/pereezdy_gruzoperevozki_dostavki_do_3_tonn_7275388730" target="_blank">Авито ↗</a></td><td></td><td>2026-02-25</td></tr>
+
+</tbody>
+</table>
+<script>
+let activeNiche = 'all';
+let activeStatus = 'all';
+
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('#clients tbody tr').forEach(tr => {
+    const matchText = !q || tr.textContent.toLowerCase().includes(q);
+    const matchNiche = activeNiche === 'all' || tr.dataset.niche === activeNiche;
+    const matchStatus = activeStatus === 'all' || tr.dataset.status === activeStatus;
+    tr.style.display = (matchText && matchNiche && matchStatus) ? '' : 'none';
+  });
+}
+
+function filterNiche(nk) {
+  activeNiche = nk;
+  activeStatus = 'all';
+  // Подсветка активной карточки
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  if (nk !== 'all') {
+    const nicheCards = document.querySelectorAll('.card.niche-' + nk);
+    nicheCards.forEach(c => c.classList.add('active'));
+  } else {
+    const totalCard = document.querySelector('.card.total');
+    if (totalCard) totalCard.classList.add('active');
+  }
+  updateHint();
+  filterTable();
+}
+
+function filterStatus(st) {
+  activeStatus = activeStatus === st ? 'all' : st;
+  activeNiche = 'all';
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  updateHint();
+  filterTable();
+}
+
+function dlChange(sel) {
+  const val = sel.value;
+  sel.setAttribute('data-v', val);
+  const row = sel.closest('tr');
+  const name = row ? row.cells[0].textContent.trim() : '';
+  // Сохраняем в localStorage — выживает при регенерации дашборда
+  if (name) {
+    try { localStorage.setItem('dlg:' + name, val); } catch(e) {}
+  }
+  console.log('Диалог сохранён:', name, '->', val);
+}
+
+// Восстанавливаем статусы из localStorage при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('#clients tbody tr').forEach(function(tr) {
+    const name = tr.cells[0] ? tr.cells[0].textContent.trim() : '';
+    if (!name) return;
+    let saved;
+    try { saved = localStorage.getItem('dlg:' + name); } catch(e) {}
+    if (!saved) return;
+    const sel = tr.querySelector('.dl-sel');
+    if (sel && sel.value !== saved) {
+      sel.value = saved;
+      sel.setAttribute('data-v', saved);
+    }
+  });
+});
+
+function updateHint() {
+  const hint = document.getElementById('filterHint');
+  const nameEl = document.getElementById('filterName');
+  if (activeNiche !== 'all') {
+    const labels = {'lash':'Ресницы','nail':'Маникюр','cargo':'Грузоперевозки','salon':'Салон красоты'};
+    nameEl.textContent = labels[activeNiche] || activeNiche;
+    hint.style.display = '';
+  } else if (activeStatus !== 'all') {
+    nameEl.textContent = activeStatus;
+    hint.style.display = '';
+  } else {
+    hint.style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
